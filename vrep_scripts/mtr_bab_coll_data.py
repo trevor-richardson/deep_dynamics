@@ -53,8 +53,6 @@ def get_motor_babbl_data(num_iterations):
         #print state
         ret_code, pos = vrep.simxGetObjectPosition(clientID, base_handle, -1, vrep.simx_opmode_oneshot_wait)
         ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot_wait)
-        #consider making the random action gaussian distributed and add infinite floor
-        #generate action
         action = np.random.normal(0, 20.0)
 
         collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], action])
