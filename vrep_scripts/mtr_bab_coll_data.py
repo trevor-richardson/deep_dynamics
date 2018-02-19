@@ -17,6 +17,7 @@ config.read('../config.ini')
 base_dir = config['DEFAULT']['BASE_DIR']
 
 '''
+
 This scrip generates the training, validation and testing data for my deep dynamics model
 
 training data
@@ -53,9 +54,10 @@ def get_motor_babbl_data(num_iterations):
         #print state
         ret_code, pos = vrep.simxGetObjectPosition(clientID, base_handle, -1, vrep.simx_opmode_oneshot_wait)
         ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot_wait)
+
         action = np.random.normal(0, 20.0)
 
-        collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], action])
+        collector.append([pos[0], pos[1], velo[0], velo[1], action])
         return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
         return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
         sleep(.4) #needs to vary probably
