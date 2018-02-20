@@ -57,11 +57,16 @@ def collectImageData(clientID):
         while (vrep.simxGetConnectionId(clientID)!=-1 and time.time() < t_end):
             res,resolution,image=vrep.simxGetVisionSensorImage(clientID,v0,0,vrep.simx_opmode_buffer)
 
+            if count % 20 == 0:
+                action = np.random.randint(-4, high=4)
+                action *=5
+                return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
+                return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
+
             #convert the image add to numpy array we collect about 35 images per simulation
             if res==vrep.simx_return_ok:
                 #if we get the image now we need to get the state data this needs to be
                 # print(count, len(list_of_images))
-                action = 0 # I need to produce the action in a deep reinforcement learning algorithm but for now I will make the action 0
                 ret_code, pos = vrep.simxGetObjectPosition(clientID, base_handle, -1, vrep.simx_opmode_oneshot)
                 ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot)
                 collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], action])
@@ -106,31 +111,31 @@ def detectCollisionSignal(clientID):
         # print ("\nMiss")
         return 0
 
-def detectCollisionSignalPerterbDistance(clientID):
-    #get the current position of the robot
-    lineTracerBase=vrep.simxGetObjectHandle(clientID, "LineTracerBase", vrep.simx_opmode_oneshot_wait)
-    ret_code, pos=vrep.simxGetObjectPosition(clientID, lineTracerBase[1], -1, vrep.simx_opmode_oneshot_wait)
+# def detectCollisionSignalPerterbDistance(clientID):
+#     #get the current position of the robot
+#     lineTracerBase=vrep.simxGetObjectHandle(clientID, "LineTracerBase", vrep.simx_opmode_oneshot_wait)
+#     ret_code, pos=vrep.simxGetObjectPosition(clientID, lineTracerBase[1], -1, vrep.simx_opmode_oneshot_wait)
+#
+#     if (abs(pos[0] - .057) > .07):
+#         return 1 #there is a hit
+#     else:
+#         return 0
 
-    if (abs(pos[0] - .057) > .07):
-        return 1 #there is a hit
-    else:
-        return 0
-
-def detectCollisionSignalPerterbAngle(clientID):
-
-    lineTracerBase=vrep.simxGetObjectHandle(clientID, "LineTracerBase", vrep.simx_opmode_oneshot_wait)
-    ret_code, pos=vrep.simxGetObjectOrientation(clientID, lineTracerBase[1], -1, vrep.simx_opmode_oneshot_wait)
-    if abs(pos[2]) > .01:
-        return 1 # there is a hit
-    else:
-        if abs(pos[0]) > .01:
-            return 1
-        else:
-            if abs(pos[1]) > .1:
-                return 1
-            else:
-                return 0
-    return 0
+# def detectCollisionSignalPerterbAngle(clientID):
+#
+#     lineTracerBase=vrep.simxGetObjectHandle(clientID, "LineTracerBase", vrep.simx_opmode_oneshot_wait)
+#     ret_code, pos=vrep.simxGetObjectOrientation(clientID, lineTracerBase[1], -1, vrep.simx_opmode_oneshot_wait)
+#     if abs(pos[2]) > .01:
+#         return 1 # there is a hit
+#     else:
+#         if abs(pos[0]) > .01:
+#             return 1
+#         else:
+#             if abs(pos[1]) > .1:
+#                 return 1
+#             else:
+#                 return 0
+#     return 0
 
 
 def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal):
@@ -194,8 +199,8 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
         if collision_signal:
             str_name_image = base_dir + '/data_generated/current_version/val/hit_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/current_version/val/hit_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
-            np.save(str_name_image, video)
+            # np.save(str_name_state, state)
+            # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/current_version/val/miss_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/current_version/val/miss_state/' + str(n_iter) + 'collision3'
@@ -206,8 +211,8 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
         if collision_signal:
             str_name_image = base_dir + '/data_generated/current_version/test/hit_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/current_version/test/hit_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
-            np.save(str_name_image, video)
+            # np.save(str_name_state, state)
+            # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/current_version/test/miss_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/current_version/test/miss_state/' + str(n_iter) + 'collision3'
@@ -218,8 +223,8 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
         if collision_signal:
             str_name_image = base_dir + '/current_version/train/hit_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/current_version/train/hit_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
-            np.save(str_name_image, video)
+            # np.save(str_name_state, state)
+            # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/current_version/train/miss_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/current_version/train/miss_state/' + str(n_iter) + 'collision3'
@@ -262,10 +267,6 @@ def single_simulation(n_iter, txt_file_counter):
     clientID, start_error = start()
     image_array, state_array = collectImageData(clientID) #store these images
     collision_signal = detectCollisionSignal(clientID) #This records whether hit or miss
-    if collision_signal == 0:
-        collision_signal = detectCollisionSignalPerterbDistance(clientID) #backup check
-        if collision_signal == 0:
-            collision_signal = detectCollisionSignalPerterbAngle(clientID)
     end_error = end(clientID)
     if collision_signal:
         print("HIT")
