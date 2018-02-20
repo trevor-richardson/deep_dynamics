@@ -211,37 +211,37 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
     test_or_train = random.uniform(0, 1)
     if test_or_train < .45:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision'
-            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision'
+            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision2'
             np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision'
-            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision'
+            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision2'
             np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     elif test_or_train < .9:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision'
-            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision'
+            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision2'
             np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision'
-            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision'
+            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision2'
             np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     else:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision'
-            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision'
+            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision2'
             np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision'
-            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision'
+            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision2'
             np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
@@ -260,23 +260,6 @@ def write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter):
     filename_hit = base_dir + '/vrep_scripts/saved_vel_pos_data/train/hit/hit' + str(txt_file_counter)
     filename_get_velocity = base_dir + '/vrep_scripts/saved_vel_pos_data/velocity.txt'
     print("\n")
-    #load the current velocity used
-    with open(filename_get_velocity, "r") as new_vel_file:
-        content = new_vel_file.readlines()
-    content = [float(x.strip()) for x in content]
-
-    #get the current position
-    x_pos = x_list_of_positions[txt_file_counter]
-    y_pos = y_list_of_positions[txt_file_counter]
-
-    #save the current position velo data for future use
-    # save_data = np.asarray((x_pos, y_pos, z_permanent, content[0], content[1], content[2]))
-    # if collision_signal:
-    #     print("SAVING HIT POS VELO ", filename_hit)
-    #     np.save(filename_hit, save_data)
-    # else:
-    #     print("SAVING MISS POS VELO ", filename_miss)
-    #     np.save(filename_miss, save_data)
 
     with open(filename_newpos, "w") as new_pos_file:
         print(x_list_of_positions[txt_file_counter + 1], file=new_pos_file)
@@ -328,11 +311,11 @@ def single_simulation(n_iter, txt_file_counter):
     print("\n")
 
 def main(iter_start, iter_end):
-    txt_file_counter = 10
+    txt_file_counter = 1
     for current_iteration in range(iter_start, iter_end):
         single_simulation(current_iteration, txt_file_counter)
         txt_file_counter+=1
 
 
 if __name__ == '__main__':
-    main(0,10000)
+    main(0,3000)
