@@ -29,6 +29,12 @@ x_list_of_positions2 = np.random.normal(2, 1.0, 3000)
 y_list_of_positions2 = np.random.normal(-12 , 1.0, 3000)
 x_list_of_positions3 = np.random.normal(-2, 1.0, 3000)
 y_list_of_positions3 = np.random.normal(-12 , 1.0, 3000)
+x_list_of_positions4 = np.random.normal(0, 1.0, 3000)
+y_list_of_positions4 = np.random.normal(-12 , 1.0, 3000)
+x_list_of_positions5 = np.random.normal(0, 1.0, 3000)
+y_list_of_positions5 = np.random.normal(-12 , 1.0, 3000)
+x_list_of_positions6 = np.random.normal(0, 1.0, 3000)
+y_list_of_positions6 = np.random.normal(-12 , 1.0, 3000)
 z_permanent = .2555
 
 with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position.txt', "w") as new_pos_file:
@@ -37,23 +43,38 @@ with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position.txt', "w
     print(z_permanent, file=new_pos_file)
 
 with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position0.txt', "w") as new_pos_file:
-    print(x_list_of_positions0[1], file=new_pos_file)
-    print(y_list_of_positions0[1], file=new_pos_file)
+    print(x_list_of_positions0[0], file=new_pos_file)
+    print(y_list_of_positions0[0], file=new_pos_file)
     print(z_permanent, file=new_pos_file)
 
 with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position1.txt', "w") as new_pos_file:
-    print(x_list_of_positions1[2], file=new_pos_file)
-    print(y_list_of_positions1[2], file=new_pos_file)
+    print(x_list_of_positions1[0], file=new_pos_file)
+    print(y_list_of_positions1[0], file=new_pos_file)
     print(z_permanent, file=new_pos_file)
 
 with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position2.txt', "w") as new_pos_file:
-    print(x_list_of_positions2[3], file=new_pos_file)
-    print(y_list_of_positions2[3], file=new_pos_file)
+    print(x_list_of_positions2[0], file=new_pos_file)
+    print(y_list_of_positions2[0], file=new_pos_file)
     print(z_permanent, file=new_pos_file)
 
 with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position3.txt', "w") as new_pos_file:
-    print(x_list_of_positions3[4], file=new_pos_file)
-    print(y_list_of_positions3[4], file=new_pos_file)
+    print(x_list_of_positions3[0], file=new_pos_file)
+    print(y_list_of_positions3[0], file=new_pos_file)
+    print(z_permanent, file=new_pos_file)
+
+with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position4.txt', "w") as new_pos_file:
+    print(x_list_of_positions4[0], file=new_pos_file)
+    print(y_list_of_positions4[0], file=new_pos_file)
+    print(z_permanent, file=new_pos_file)
+
+with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position5.txt', "w") as new_pos_file:
+    print(x_list_of_positions5[0], file=new_pos_file)
+    print(y_list_of_positions5[0], file=new_pos_file)
+    print(z_permanent, file=new_pos_file)
+
+with open(base_dir + '/vrep_scripts/saved_vel_pos_data/current_position6.txt', "w") as new_pos_file:
+    print(x_list_of_positions6[0], file=new_pos_file)
+    print(y_list_of_positions6[0], file=new_pos_file)
     print(z_permanent, file=new_pos_file)
 
 def start():
@@ -146,80 +167,82 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
     reduced_image.append(image_array[0])
     reduced_state.append(state_array[0])
 
-    for enumerator in range(len(image_array)):
-        if enumerator % time_dilation == 0 and enumerator != 0:
-            #create random number and decide on the enumerator value
-            noise = random.uniform(0, 1) #dont grab every video at that exact offset
-            if noise < .1:
-                reduced_state.append(state_array[enumerator - 2])
-                reduced_image.append(image_array[enumerator - 2])
-            elif noise < .2:
-                reduced_image.append(image_array[enumerator - 1])
-                reduced_state.append(state_array[enumerator - 1])
-            elif noise < .3:
-                if enumerator + 1 < len(image_array):
-                    reduced_state.append(state_array[enumerator + 1])
-                    reduced_image.append(image_array[enumerator + 1])
-            elif noise < .4:
-                if enumerator + 2 < len(image_array):
-                    reduced_state.append(state_array[enumerator + 2])
-                    reduced_image.append(image_array[enumerator + 2])
-            else:
-                reduced_image.append(image_array[enumerator])
-                reduced_state.append(state_array[enumerator])
+    print(len(state_array), "length state array", len(image_array))
 
-
-
-    print("Cluster ", time_dilation, "  size of reduced array img and state ", len(reduced_image), len(reduced_state))
-    selected_images = reduced_image[:70]
-    selected_states = reduced_state[:70]
+    # for enumerator in range(len(image_array)):
+    #     if enumerator % time_dilation == 0 and enumerator != 0:
+    #         #create random number and decide on the enumerator value
+    #         noise = random.uniform(0, 1) #dont grab every video at that exact offset
+    #         if noise < .1:
+    #             reduced_state.append(state_array[enumerator - 2])
+    #             reduced_image.append(image_array[enumerator - 2])
+    #         elif noise < .2:
+    #             reduced_image.append(image_array[enumerator - 1])
+    #             reduced_state.append(state_array[enumerator - 1])
+    #         elif noise < .3:
+    #             if enumerator + 1 < len(image_array):
+    #                 reduced_state.append(state_array[enumerator + 1])
+    #                 reduced_image.append(image_array[enumerator + 1])
+    #         elif noise < .4:
+    #             if enumerator + 2 < len(image_array):
+    #                 reduced_state.append(state_array[enumerator + 2])
+    #                 reduced_image.append(image_array[enumerator + 2])
+    #         else:
+    #             reduced_image.append(image_array[enumerator])
+    #             reduced_state.append(state_array[enumerator])
+    #
+    #
+    #
+    # print("Cluster ", time_dilation, "  size of reduced array img and state ", len(reduced_image), len(reduced_state))
+    # selected_images = reduced_image[:70]
+    # selected_states = reduced_state[:70]
     # print("After slicing  ", len(selected_images))
             # scipy.misc.imsave(str(enumerator) + 'outfile.png', image_array[enumerator])
 
-    video_arr = np.concatenate([arr[np.newaxis] for arr in selected_images])
+    video_arr = np.concatenate([arr[np.newaxis] for arr in image_array])
     video = np.moveaxis(video_arr, -1, 1)
-    state = np.asarray(selected_states) #this is ready to be saved!
+    state = np.asarray(state_array) #this is ready to be saved!
     # print("hey bitch ", state_arr.shape)
 
     print (collision_signal)
-    print (video.shape)
+    # print (video.shape)
     print (state.shape)
 
     test_or_train = random.uniform(0, 1)
     if test_or_train < .45:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/val/hit_image/' + str(n_iter) + 'collision3'
-            str_name_state = base_dir + '/data_generated/current_version/val/hit_state/' + str(n_iter) + 'collision3'
-            # np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision'
+            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision'
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/val/miss_image/' + str(n_iter) + 'collision3'
-            str_name_state = base_dir + '/data_generated/current_version/val/miss_state/' + str(n_iter) + 'collision3'
-            # np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision'
+            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision'
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     elif test_or_train < .9:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/test/hit_image/' + str(n_iter) + 'collision3'
-            str_name_state = base_dir + '/data_generated/current_version/test/hit_state/' + str(n_iter) + 'collision3'
-            # np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision'
+            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision'
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/test/miss_image/' + str(n_iter) + 'collision3'
-            str_name_state = base_dir + '/data_generated/current_version/test/miss_state/' + str(n_iter) + 'collision3'
-            # np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision'
+            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision'
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     else:
         if collision_signal:
-            str_name_image = base_dir + '/current_version/train/hit_image/' + str(n_iter) + 'collision3'
-            str_name_state = base_dir + '/data_generated/current_version/train/hit_state/' + str(n_iter) + 'collision3'
-            # np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision'
+            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision'
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/train/miss_image/' + str(n_iter) + 'collision3'
-            str_name_state = base_dir + '/data_generated/current_version/train/miss_state/' + str(n_iter) + 'collision3'
-            # np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision'
+            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision'
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
 
@@ -230,6 +253,9 @@ def write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter):
     filename_newpos1 = base_dir + '/vrep_scripts/saved_vel_pos_data/current_position1.txt'
     filename_newpos2 = base_dir + '/vrep_scripts/saved_vel_pos_data/current_position2.txt'
     filename_newpos3 = base_dir + '/vrep_scripts/saved_vel_pos_data/current_position3.txt'
+    filename_newpos4 = base_dir + '/vrep_scripts/saved_vel_pos_data/current_position4.txt'
+    filename_newpos5 = base_dir + '/vrep_scripts/saved_vel_pos_data/current_position5.txt'
+    filename_newpos6 = base_dir + '/vrep_scripts/saved_vel_pos_data/current_position6.txt'
     filename_miss = base_dir + '/vrep_scripts/saved_vel_pos_data/train/miss/miss' + str(txt_file_counter)
     filename_hit = base_dir + '/vrep_scripts/saved_vel_pos_data/train/hit/hit' + str(txt_file_counter)
     filename_get_velocity = base_dir + '/vrep_scripts/saved_vel_pos_data/velocity.txt'
@@ -244,13 +270,13 @@ def write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter):
     y_pos = y_list_of_positions[txt_file_counter]
 
     #save the current position velo data for future use
-    save_data = np.asarray((x_pos, y_pos, z_permanent, content[0], content[1], content[2]))
-    if collision_signal:
-        print("SAVING HIT POS VELO ", filename_hit)
-        np.save(filename_hit, save_data)
-    else:
-        print("SAVING MISS POS VELO ", filename_miss)
-        np.save(filename_miss, save_data)
+    # save_data = np.asarray((x_pos, y_pos, z_permanent, content[0], content[1], content[2]))
+    # if collision_signal:
+    #     print("SAVING HIT POS VELO ", filename_hit)
+    #     np.save(filename_hit, save_data)
+    # else:
+    #     print("SAVING MISS POS VELO ", filename_miss)
+    #     np.save(filename_miss, save_data)
 
     with open(filename_newpos, "w") as new_pos_file:
         print(x_list_of_positions[txt_file_counter + 1], file=new_pos_file)
@@ -271,6 +297,18 @@ def write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter):
     with open(filename_newpos3, "w") as new_pos_file:
         print(x_list_of_positions3[txt_file_counter + 1], file=new_pos_file)
         print(y_list_of_positions3[txt_file_counter + 1], file=new_pos_file)
+        print(z_permanent, file=new_pos_file)
+    with open(filename_newpos4, "w") as new_pos_file:
+        print(x_list_of_positions4[txt_file_counter + 1], file=new_pos_file)
+        print(y_list_of_positions4[txt_file_counter + 1], file=new_pos_file)
+        print(z_permanent, file=new_pos_file)
+    with open(filename_newpos5, "w") as new_pos_file:
+        print(x_list_of_positions5[txt_file_counter + 1], file=new_pos_file)
+        print(y_list_of_positions5[txt_file_counter + 1], file=new_pos_file)
+        print(z_permanent, file=new_pos_file)
+    with open(filename_newpos6, "w") as new_pos_file:
+        print(x_list_of_positions6[txt_file_counter + 1], file=new_pos_file)
+        print(y_list_of_positions6[txt_file_counter + 1], file=new_pos_file)
         print(z_permanent, file=new_pos_file)
 
 def single_simulation(n_iter, txt_file_counter):
