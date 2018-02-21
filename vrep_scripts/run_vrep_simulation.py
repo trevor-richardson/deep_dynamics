@@ -167,82 +167,80 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
     reduced_image.append(image_array[0])
     reduced_state.append(state_array[0])
 
-    print(len(state_array), "length state array", len(image_array))
+    for enumerator in range(len(image_array)):
+        if enumerator % time_dilation == 0 and enumerator != 0:
+            #create random number and decide on the enumerator value
+            noise = random.uniform(0, 1) #dont grab every video at that exact offset
+            if noise < .1:
+                reduced_state.append(state_array[enumerator - 2])
+                reduced_image.append(image_array[enumerator - 2])
+            elif noise < .2:
+                reduced_image.append(image_array[enumerator - 1])
+                reduced_state.append(state_array[enumerator - 1])
+            elif noise < .3:
+                if enumerator + 1 < len(image_array):
+                    reduced_state.append(state_array[enumerator + 1])
+                    reduced_image.append(image_array[enumerator + 1])
+            elif noise < .4:
+                if enumerator + 2 < len(image_array):
+                    reduced_state.append(state_array[enumerator + 2])
+                    reduced_image.append(image_array[enumerator + 2])
+            else:
+                reduced_image.append(image_array[enumerator])
+                reduced_state.append(state_array[enumerator])
 
-    # for enumerator in range(len(image_array)):
-    #     if enumerator % time_dilation == 0 and enumerator != 0:
-    #         #create random number and decide on the enumerator value
-    #         noise = random.uniform(0, 1) #dont grab every video at that exact offset
-    #         if noise < .1:
-    #             reduced_state.append(state_array[enumerator - 2])
-    #             reduced_image.append(image_array[enumerator - 2])
-    #         elif noise < .2:
-    #             reduced_image.append(image_array[enumerator - 1])
-    #             reduced_state.append(state_array[enumerator - 1])
-    #         elif noise < .3:
-    #             if enumerator + 1 < len(image_array):
-    #                 reduced_state.append(state_array[enumerator + 1])
-    #                 reduced_image.append(image_array[enumerator + 1])
-    #         elif noise < .4:
-    #             if enumerator + 2 < len(image_array):
-    #                 reduced_state.append(state_array[enumerator + 2])
-    #                 reduced_image.append(image_array[enumerator + 2])
-    #         else:
-    #             reduced_image.append(image_array[enumerator])
-    #             reduced_state.append(state_array[enumerator])
-    #
-    #
-    #
-    # print("Cluster ", time_dilation, "  size of reduced array img and state ", len(reduced_image), len(reduced_state))
-    # selected_images = reduced_image[:70]
-    # selected_states = reduced_state[:70]
+
+
+    print("Cluster ", time_dilation, "  size of reduced array img and state ", len(reduced_image), len(reduced_state))
+    selected_images = reduced_image[:70]
+    selected_states = reduced_state[:70]
     # print("After slicing  ", len(selected_images))
             # scipy.misc.imsave(str(enumerator) + 'outfile.png', image_array[enumerator])
 
-    video_arr = np.concatenate([arr[np.newaxis] for arr in image_array])
+    video_arr = np.concatenate([arr[np.newaxis] for arr in selected_images])
     video = np.moveaxis(video_arr, -1, 1)
-    state = np.asarray(state_array) #this is ready to be saved!
+    state = np.asarray(selected_states) #this is ready to be saved!
     # print("hey bitch ", state_arr.shape)
 
     print (collision_signal)
-    # print (video.shape)
+    print (video.shape)
     print (state.shape)
 
     test_or_train = random.uniform(0, 1)
     if test_or_train < .45:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision2'
-            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision2'
-            np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision2'
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision2'
-            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision2'
-            np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision2'
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     elif test_or_train < .9:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision2'
-            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision2'
-            np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision2'
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision2'
-            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision2'
-            np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision2'
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     else:
         if collision_signal:
-            str_name_image = base_dir + '/data_generated/current_version/hit_image/' + str(n_iter) + 'collision2'
-            str_name_state = base_dir + '/data_generated/current_version/hit_state/' + str(n_iter) + 'collision2'
-            np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision2'
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
-            str_name_image = base_dir + '/data_generated/current_version/miss_image/' + str(n_iter) + 'collision2'
-            str_name_state = base_dir + '/data_generated/current_version/miss_state/' + str(n_iter) + 'collision2'
-            np.save(str_name_state, state)
+            str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision2'
+            str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision2'
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
 

@@ -105,6 +105,7 @@ else:
 train_data = np.round(train_data, 2)
 train_label = np.round(train_label, 2)
 
+
 #get basic stats about data
 val_data = train_data[int(.7 * train_data.shape[0]):]
 val_label = train_label[int(.7 * train_data.shape[0]):]
@@ -262,9 +263,11 @@ def main():
         print("Testing ")
         load_model(model_to_load)
         for i in range(100):
-            single_hit = test_hit[i]
-            single_miss = test_miss[i]
-            evaluate_model(num_forward_passes, single_hit, single_miss)
+            single_hit = np.round(test_hit[i], 2)
+            single_miss = np.round(test_miss[i], 2)
+            for element in single_hit:
+                print(element)
+        # evaluate_model(num_forward_passes, single_hit, single_miss)
 
 if __name__ == '__main__':
     main()
