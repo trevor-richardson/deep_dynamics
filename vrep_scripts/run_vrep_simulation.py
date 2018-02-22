@@ -98,12 +98,14 @@ def collectImageData(clientID):
         t_end = time.time() + 2.8
         collision_bool = False
         count = 0
+        updated_counter = 0
         while (vrep.simxGetConnectionId(clientID)!=-1 and time.time() < t_end):
             res,resolution,image=vrep.simxGetVisionSensorImage(clientID,v0,0,vrep.simx_opmode_buffer)
 
-            if count % 100 == 0:
+            if count % 300 == 0:
                 action = np.random.randint(-5, high=5)
                 action *=10
+                updated_counter+=1
                 return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
                 return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
 
@@ -123,6 +125,7 @@ def collectImageData(clientID):
                 list_of_images.append(rotate_img)
 
                 count+=1
+        print("updated counter", updated_counter)
         return list_of_images, collector
     else:
         sys.exit()
@@ -211,36 +214,36 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision2'
             str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision2'
-            # np.save(str_name_state, state)
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision2'
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision2'
-            # np.save(str_name_state, state)
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     elif test_or_train < .9:
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision2'
             str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision2'
-            # np.save(str_name_state, state)
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision2'
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision2'
-            # np.save(str_name_state, state)
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     else:
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision2'
             str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision2'
-            # np.save(str_name_state, state)
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision2'
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision2'
-            # np.save(str_name_state, state)
+            np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
 

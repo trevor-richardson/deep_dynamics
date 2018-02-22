@@ -17,9 +17,7 @@ class Deep_Dynamics(nn.Module):
 
         self.h_3 = nn.Linear(num_neurons_2, num_neurons_3)
 
-        self.h_4 = nn.Linear(num_neurons_3, num_neurons_4)
-
-        self.output = nn.Linear(num_neurons_4, output_shp)
+        self.output = nn.Linear(num_neurons_3, output_shp)
 
         self.dropout = nn.Dropout(dropout_rte)
 
@@ -29,12 +27,11 @@ class Deep_Dynamics(nn.Module):
 
         drop_1 = self.dropout(F.tanh(self.h_1(drop_0)))
 
-        drop_2 = self.dropout(F.relu(self.h_2(drop_1)))
+        drop_2 = self.dropout(F.tanh(self.h_2(drop_1)))
 
-        drop_3 = self.dropout(F.relu(self.h_3(drop_2)))
+        drop_3 = self.dropout(F.tanh(self.h_3(drop_2)))
 
-        drop_4 = self.dropout(F.relu(self.h_4(drop_3)))
 
-        y = self.output(drop_4)
+        y = self.output(drop_3)
 
         return y

@@ -24,6 +24,8 @@ config.read('../config.ini')
 base_dir = config['DEFAULT']['BASE_DIR']
 load_data_bool = False
 train_bool = False
+model_to_load = '0.11590736295.pth'
+
 '''
 This supervised learning model learns to predict the future state of the robot given only information retrievable to
 A robot in the field such as its internal state. Given the robot state and action predict the next state.
@@ -34,8 +36,8 @@ In theory this is a labeling device for an unsupervised scenario which is -- did
 ''' train_feature, train_label -- 70 percent of hits and misses and their label -- 30 percent I want by ground truth for checking'''
 
 if load_data_bool:
-    hit_dir = base_dir + '/data_generated/current_version/hit_state/'
-    miss_dir = base_dir + '/data_generated/current_version/miss_state/'
+    hit_dir = base_dir + '/data_generated/aligned_version/hit_state/'
+    miss_dir = base_dir + '/data_generated/aligned_version/miss_state/'
 
     data = []
     label = []
@@ -198,6 +200,7 @@ def load_model(path):
 '''Test what strategy allows me to classify hits vs misses'''
 def evaluate_model(num_forward_passes, single_hit, single_miss):
     print("evaluating strategy")
+    model.train()
 
     smallest = 999999999
 
@@ -237,37 +240,38 @@ def calc_statistics(lst, recorded_state):
     mean = np.mean(lst)
     var = np.var(lst)
     f = stats.multivariate_normal.pdf(recorded_state, mean=mean, cov=var)
-    return np.min(f)
+    return np.prod(f)
 
 
 def main():
     global model
     global test_hit
     global test_miss
+    global model_to_load
 
-    epochs = 75
-    batch_size = 128
-    model_to_load = '0.198421919696.pth'
+    epochs = 200
+    batch_size = 32
+
     smallest_loss = 10000
     num_forward_passes = 64
     if train_bool:
         for epoch in range(epochs):
             train_model(epoch, batch_size)
             loss = validate_model(epoch, batch_size)
-            if loss < smallest_loss:
-                save_model(model, loss)
-                smallest_loss = loss
+            # if loss < smallest_loss:
+            save_model(model, loss)
+            smallest_loss = loss
             print("\n*****************************\n")
         print(smallest_loss)
+        save_model(model, loss)
     else:
         print("Testing ")
         load_model(model_to_load)
         for i in range(100):
             single_hit = np.round(test_hit[i], 2)
             single_miss = np.round(test_miss[i], 2)
-            for element in single_hit:
-                print(element)
-        # evaluate_model(num_forward_passes, single_hit, single_miss)
+
+            evaluate_model(num_forward_passes, single_hit, single_miss)
 
 if __name__ == '__main__':
     main()
