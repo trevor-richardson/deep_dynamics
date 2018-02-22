@@ -24,7 +24,7 @@ config.read('../config.ini')
 base_dir = config['DEFAULT']['BASE_DIR']
 load_data_bool = False
 train_bool = False
-model_to_load = '0.11590736295.pth'
+model_to_load = '0.111379066878.pth'
 
 '''
 This supervised learning model learns to predict the future state of the robot given only information retrievable to
@@ -240,7 +240,7 @@ def calc_statistics(lst, recorded_state):
     mean = np.mean(lst)
     var = np.var(lst)
     f = stats.multivariate_normal.pdf(recorded_state, mean=mean, cov=var)
-    return np.prod(f)
+    return np.min(f)
 
 
 def main():
