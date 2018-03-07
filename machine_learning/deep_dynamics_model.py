@@ -31,7 +31,6 @@ class Deep_Dynamics(nn.Module):
 
         drop_3 = self.dropout(F.tanh(self.h_3(drop_2)))
 
-
         y = self.output(drop_3)
 
         return y

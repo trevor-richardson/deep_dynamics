@@ -49,29 +49,39 @@ def get_motor_babbl_data(num_iterations):
     ret_code, left_handle = vrep.simxGetObjectHandle(clientID,'DynamicLeftJoint', vrep.simx_opmode_oneshot_wait)
     ret_code, right_handle = vrep.simxGetObjectHandle(clientID,'DynamicRightJoint', vrep.simx_opmode_oneshot_wait)
     ret_code, base_handle = vrep.simxGetObjectHandle(clientID, 'LineTracerBase', vrep.simx_opmode_oneshot_wait)
-
+    rand = np.random.randint(8)
+    act = np.random.randint(5)
+    action = (act -2)  * 15
     for iterator in range(num_iterations):
-        #print state
         ret_code, pos = vrep.simxGetObjectPosition(clientID, base_handle, -1, vrep.simx_opmode_oneshot_wait)
         ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot_wait)
+        ret_code, euler_angles = vrep.simxGetObjectOrientation(clientID, base_handle, -1, vrep.simx_opmode_oneshot_wait)
 
-        action = np.random.normal(0, 20.0)
+        if rand == 0:
+            rand = np.random.randint(8) + 1
+            act = np.random.randint(5)
+            action = (act -2)  * 15
 
-        collector.append([pos[0], pos[1], velo[0], velo[1], action])
+        if iterator % 100 == 0:
+            print(iterator)
+
+
+        collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], euler_angles[0], euler_angles[1],
+            euler_angles[2], action])
         return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
         return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
-        sleep(.4) #needs to vary probably
-        #print action
-
+        rand += -1
     end(clientID)
+    counter = 0
     for element in collector:
-        num = np.random.uniform()
-        if num < .15:
+
+        if counter < .15 * int(len(collector)):
             val.append(element)
-        elif num < .3:
+        elif counter < .3 * int(len(collector)):
             test.append(element)
         else:
             train.append(element)
+        counter +=1
 
     print("train ", len(train))
     print("val ", len(val))
@@ -79,7 +89,6 @@ def get_motor_babbl_data(num_iterations):
 
     train_array, train_label, val_array, val_label, test_array, test_label = make_final_format(train, val, test)
     return train_array, train_label, val_array, val_label, test_array, test_label
-
 
 def make_final_format(train, val, test):
     train_array = []
@@ -92,7 +101,6 @@ def make_final_format(train, val, test):
     for index in range(len(train) - 1):
         train_array.append(train[index])
         train_label.append(train[index + 1][0:len(train[index])-1])
-        # print (train_array[index], " PRINT THIS ", train_label[index])
 
     for index in range(len(val) - 1):
         val_array.append(val[index])
@@ -101,7 +109,6 @@ def make_final_format(train, val, test):
     for index in range(len(test) - 1):
         test_array.append(test[index])
         test_label.append(test[index + 1][0:len(test[index])-1])
-
 
     train_array = np.asarray(train_array)
     train_label = np.asarray(train_label)
@@ -117,17 +124,18 @@ iter_start and end are what decides how many data points I will create this iter
 '''
 
 def main(prevsim):
-    num_iterations = 2000
-    version = 0 #increment this every time so you do not overwrite the data
-    train_array, train_label, val_array, val_label, test_array, test_label = get_motor_babbl_data(num_iterations)
-    np.save(base_dir + '/data_generated/motor_babble/train/feature/train' + str(version), train_array)
-    np.save(base_dir + '/data_generated/motor_babble/train/label/train' + str(version), train_label)
+    num_iterations = 500
+    #increment this every time so you do not overwrite the data
+    for x in range(2000):
+        train_array, train_label, val_array, val_label, test_array, test_label = get_motor_babbl_data(num_iterations)
+        np.save(base_dir + '/data_generated/motor_babble/train/feature/train' + str(x), train_array)
+        np.save(base_dir + '/data_generated/motor_babble/train/label/train' + str(x), train_label)
 
-    np.save(base_dir + '/data_generated/motor_babble/val/feature/val' + str(version), val_array)
-    np.save(base_dir + '/data_generated/motor_babble/val/label/val' + str(version), val_label)
+        np.save(base_dir + '/data_generated/motor_babble/val/feature/val' + str(x), val_array)
+        np.save(base_dir + '/data_generated/motor_babble/val/label/val' + str(x), val_label)
 
-    np.save(base_dir + '/data_generated/motor_babble/test/feature/test' + str(version), test_array)
-    np.save(base_dir + '/data_generated/motor_babble/test/label/test' + str(version), test_label)
+        np.save(base_dir + '/data_generated/motor_babble/test/feature/test' + str(x), test_array)
+        np.save(base_dir + '/data_generated/motor_babble/test/label/test' + str(x), test_label)
 
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@ config.read('../config.ini')
 
 base_dir = config['DEFAULT']['BASE_DIR']
 load_data_bool = False
-train_bool = False
+train_bool = True
 model_to_load = '0.111379066878.pth'
 
 '''
@@ -39,8 +39,6 @@ if load_data_bool:
     hit_dir = base_dir + '/data_generated/aligned_version/hit_state/'
     miss_dir = base_dir + '/data_generated/aligned_version/miss_state/'
 
-    data = []
-    label = []
     ground_truth = []
 
     hit = [f for f in listdir(hit_dir) if isfile(join(hit_dir, f))]
@@ -96,26 +94,41 @@ if load_data_bool:
 
     np.save('./preprocess_data/train_data', train_data)
     np.save('./preprocess_data/train_label', train_label)
-    #save test hits and test misses
 else:
-    train_data = np.load('./preprocess_data/train_data.npy')
-    train_label = np.load('./preprocess_data/train_label.npy')
-    test_hit = np.load('./preprocess_data/test_hit.npy')
-    test_miss = np.load('./preprocess_data/test_miss.npy')
+    data = np.load(base_dir + '/data_generated/motor_babble/train/feature/train0.npy')
+    label = np.load(base_dir + '/data_generated/motor_babble/train/label/train0.npy')
+    val_data = np.load(base_dir + '/data_generated/motor_babble/val/feature/val0.npy')
+    val_label = np.load(base_dir + '/data_generated/motor_babble/val/label/val0.npy')
+    test_data = np.load(base_dir + '/data_generated/motor_babble/test/feature/test0.npy')
+    test_label = np.load(base_dir + '/data_generated/motor_babble/test/label/test0.npy')
 
+    for i in range(100):
+        data2 = np.load(base_dir + '/data_generated/motor_babble/train/feature/train' + str(i) + '.npy')
+        label2 = np.load(base_dir + '/data_generated/motor_babble/train/label/train' + str(i) + '.npy')
+        val_data2 = np.load(base_dir + '/data_generated/motor_babble/val/feature/val' + str(i) + '.npy')
+        val_label2 = np.load(base_dir + '/data_generated/motor_babble/val/label/val' + str(i) + '.npy')
+        test_data2 = np.load(base_dir + '/data_generated/motor_babble/test/feature/test' + str(i) + '.npy')
+        test_label2 = np.load(base_dir + '/data_generated/motor_babble/test/label/test' + str(i) + '.npy')
+        data = np.concatenate((data, data2), axis=0)
+        label = np.concatenate((label, label2), axis=0)
+        val_data = np.concatenate((val_data, val_data2), axis=0)
+        val_label = np.concatenate((val_label, val_label2), axis=0)
+        test_data = np.concatenate((test_data, test_data2), axis=0)
+        test_label = np.concatenate((test_label, test_label2), axis=0)
 
-train_data = np.round(train_data, 2)
-train_label = np.round(train_label, 2)
+    data = np.round(data, 3)
 
+    label = np.round(label, 3)
+    print(data.shape, label.shape, "Training sizes")
+    label = np.round(label, 3)
+    test_data = np.round(test_data, 3)
+    test_label = np.round(test_label, 3)
+    val_data = np.round(val_data, 3)
+    val_label = np.round(val_label, 3)
 
-#get basic stats about data
-val_data = train_data[int(.7 * train_data.shape[0]):]
-val_label = train_label[int(.7 * train_data.shape[0]):]
-data = train_data[:int(.7 * train_data.shape[0])]
-label = train_label[:int(.7 * train_data.shape[0])]
 
 ''' Load Model '''
-model = Deep_Dynamics(int(data.shape[1]), 40, 30, 20, 15, 15, int(label.shape[1]), .3)
+model = Deep_Dynamics(int(data.shape[1]), 60, 40, 30, 20, 20, int(label.shape[1]), .3)
 if torch.cuda.is_available():
     model.cuda()
 
@@ -136,7 +149,6 @@ def train_model(epoch, batch_size):
             input_to_model = input_to_model.cuda()
             y_ = y_.cuda()
         input_to_model = Variable(input_to_model.float())
-        # print(input_to_model)
         y_ = Variable(y_.float())
 
         pred = model(input_to_model)
@@ -150,8 +162,6 @@ def train_model(epoch, batch_size):
 
     print('Train Epoch: {}\tLoss: {:.6f}'.format(
         epoch, train_loss.cpu().numpy()[0]/step_counter))
-
-
 
 ''' Validate Model '''
 def validate_model(epoch, batch_size):
@@ -249,8 +259,8 @@ def main():
     global test_miss
     global model_to_load
 
-    epochs = 200
-    batch_size = 32
+    epochs = 1000
+    batch_size = 128
 
     smallest_loss = 10000
     num_forward_passes = 64
@@ -258,9 +268,9 @@ def main():
         for epoch in range(epochs):
             train_model(epoch, batch_size)
             loss = validate_model(epoch, batch_size)
-            # if loss < smallest_loss:
-            save_model(model, loss)
-            smallest_loss = loss
+            if loss < 5.0:
+                save_model(model, loss)
+                smallest_loss = loss
             print("\n*****************************\n")
         print(smallest_loss)
         save_model(model, loss)
