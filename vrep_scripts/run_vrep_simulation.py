@@ -84,7 +84,6 @@ def start():
     return clientID, error_code
 
 def collectImageData(clientID):
-    #get my vision sensor working and print the data in the while loop below for 5 seconds after simulation begins
     list_of_images = []
     collector = []
     if clientID!=-1:
@@ -95,6 +94,7 @@ def collectImageData(clientID):
         ret_code, base_handle = vrep.simxGetObjectHandle(clientID, 'LineTracerBase', vrep.simx_opmode_oneshot_wait)
 
         res,resolution,image=vrep.simxGetVisionSensorImage(clientID,v0,0,vrep.simx_opmode_streaming)
+        ret_code, euler_angles = vrep.simxGetObjectOrientation(clientID, base_handle, -1, vrep.simx_opmode_streaming)
         t_end = time.time() + 2.8
         collision_bool = False
         count = 0
@@ -102,22 +102,21 @@ def collectImageData(clientID):
         while (vrep.simxGetConnectionId(clientID)!=-1 and time.time() < t_end):
             res,resolution,image=vrep.simxGetVisionSensorImage(clientID,v0,0,vrep.simx_opmode_buffer)
 
-            if count % 300 == 0:
-                action = np.random.randint(-5, high=5)
-                action *=10
+            if count % 75 == 0:
+                act = np.random.randint(5)
+                action = (act -2)  * 15
                 updated_counter+=1
                 return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
                 return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
-
             #convert the image add to numpy array we collect about 35 images per simulation
             if res==vrep.simx_return_ok:
-                #if we get the image now we need to get the state data this needs to be
-                # print(count, len(list_of_images))
+
                 ret_code, pos = vrep.simxGetObjectPosition(clientID, base_handle, -1, vrep.simx_opmode_oneshot)
                 ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot)
-                collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], action])
+                ret_code, euler_angles = vrep.simxGetObjectOrientation(clientID, base_handle, -1, vrep.simx_opmode_buffer)
 
-                #got state data
+                collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], euler_angles[0], euler_angles[1], euler_angles[2], action])
+
                 img = np.array(image,dtype=np.uint8)
                 img.resize([resolution[1],resolution[0],3])
                 rotate_img = img.copy()
@@ -131,7 +130,6 @@ def collectImageData(clientID):
         sys.exit()
 
 def end(clientID):
-    #end and cleanup
     error_code =vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
     vrep.simxFinish(clientID)
     return error_code
@@ -155,10 +153,8 @@ def detectCollisionSignal(clientID):
 
 def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal):
     #save as the 5d tensor in theano style
-    #I need a better way to select images from my video -- but for now just getting every tenth image be careful about images late in the game. -- prediction doesnt even help then
     reduced_image = []
     reduced_state = []
-    #do it here
 
     time_dilation = round(np.random.normal(12, 3)) # make sure this system can work independent of the time dilation or hz of images coming in
     if time_dilation < 5:
@@ -172,7 +168,6 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
 
     for enumerator in range(len(image_array)):
         if enumerator % time_dilation == 0 and enumerator != 0:
-            #create random number and decide on the enumerator value
             noise = random.uniform(0, 1) #dont grab every video at that exact offset
             if noise < .1:
                 reduced_state.append(state_array[enumerator - 2])
@@ -205,8 +200,8 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
     state = np.asarray(selected_states) #this is ready to be saved!
     # print("hey bitch ", state_arr.shape)
 
-    print (collision_signal)
-    print (video.shape)
+    # print (collision_signal)
+    # print (video.shape)
     print (state.shape)
 
     test_or_train = random.uniform(0, 1)
@@ -214,38 +209,40 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     elif test_or_train < .9:
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
     else:
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/aligned_version/hit_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         else:
             str_name_image = base_dir + '/data_generated/aligned_version/miss_image/' + str(n_iter) + 'collision3'
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision3'
-            np.save(str_name_state, state)
+            # np.save(str_name_state, state)
             # np.save(str_name_image, video)
         print(str_name_image, str_name_state)
+        print(state.shape)
+    return state
 
 
 def write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter):
@@ -295,6 +292,7 @@ def write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter):
         print(y_list_of_positions6[txt_file_counter + 1], file=new_pos_file)
         print(z_permanent, file=new_pos_file)
 
+
 def single_simulation(n_iter, txt_file_counter):
     print("####################################################################################################################")
     clientID, start_error = start()
@@ -307,9 +305,16 @@ def single_simulation(n_iter, txt_file_counter):
         print("MISS")
     #need to append hit or miss pos and velo and need to rewrite over last 3 position values make sure I write this info to the file
     write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter)
-    writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
+    data = writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
     # write_play_data(image_array, n_iter, collision_signal) #This is for generating tiny amount of play data
     print("\n")
+    return data
+
+
+def execute_exp():
+    data = single_simulation(0, 1)
+    return data
+
 
 def main(iter_start, iter_end):
     txt_file_counter = 1

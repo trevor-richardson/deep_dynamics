@@ -117,7 +117,6 @@ else:
         test_label = np.concatenate((test_label, test_label2), axis=0)
 
     data = np.round(data, 3)
-
     label = np.round(label, 3)
     print(data.shape, label.shape, "Training sizes")
     label = np.round(label, 3)
@@ -268,7 +267,7 @@ def main():
         for epoch in range(epochs):
             train_model(epoch, batch_size)
             loss = validate_model(epoch, batch_size)
-            if loss < 5.0:
+            if loss < .2:
                 save_model(model, loss)
                 smallest_loss = loss
             print("\n*****************************\n")

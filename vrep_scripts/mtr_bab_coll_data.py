@@ -126,7 +126,7 @@ iter_start and end are what decides how many data points I will create this iter
 def main(prevsim):
     num_iterations = 500
     #increment this every time so you do not overwrite the data
-    for x in range(2000):
+    for x in range(400):
         train_array, train_label, val_array, val_label, test_array, test_label = get_motor_babbl_data(num_iterations)
         np.save(base_dir + '/data_generated/motor_babble/train/feature/train' + str(x), train_array)
         np.save(base_dir + '/data_generated/motor_babble/train/label/train' + str(x), train_label)
