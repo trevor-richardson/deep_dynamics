@@ -26,6 +26,7 @@ save it in a numpy array and then at the end save the numpy array
 Have a global variable I iterate each time to represent the current iteration of data collection -- i
 
 '''
+
 def start():
     vrep.simxFinish(-1) # just in case, close all opened connections
     clientID=vrep.simxStart('127.0.0.1',19997,True,True,5000,5) #start my Connection
@@ -33,11 +34,13 @@ def start():
     error_code =vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot_wait)
     return clientID, error_code
 
+
 def end(clientID):
     #end and cleanup
     error_code =vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
     vrep.simxFinish(clientID)
     return error_code
+
 
 def get_motor_babbl_data(num_iterations):
     collector = []
@@ -65,7 +68,6 @@ def get_motor_babbl_data(num_iterations):
         if iterator % 100 == 0:
             print(iterator)
 
-
         collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], euler_angles[0], euler_angles[1],
             euler_angles[2], action])
         return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
@@ -89,6 +91,7 @@ def get_motor_babbl_data(num_iterations):
 
     train_array, train_label, val_array, val_label, test_array, test_label = make_final_format(train, val, test)
     return train_array, train_label, val_array, val_label, test_array, test_label
+
 
 def make_final_format(train, val, test):
     train_array = []
@@ -118,15 +121,19 @@ def make_final_format(train, val, test):
     test_label = np.asarray(test_label)
     return train_array, train_label, val_array, val_label, test_array, test_label
 
+
 '''
+
 prevsim represents the number of times I've ran this to make more data
 iter_start and end are what decides how many data points I will create this iteration
+
 '''
+
 
 def main(prevsim):
     num_iterations = 500
     #increment this every time so you do not overwrite the data
-    for x in range(400):
+    for x in range(100,400):
         train_array, train_label, val_array, val_label, test_array, test_label = get_motor_babbl_data(num_iterations)
         np.save(base_dir + '/data_generated/motor_babble/train/feature/train' + str(x), train_array)
         np.save(base_dir + '/data_generated/motor_babble/train/label/train' + str(x), train_label)

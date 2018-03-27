@@ -124,7 +124,6 @@ def collectImageData(clientID):
                 list_of_images.append(rotate_img)
 
                 count+=1
-        print("updated counter", updated_counter)
         return list_of_images, collector
     else:
         sys.exit()
@@ -189,7 +188,6 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
 
 
 
-    print("Cluster ", time_dilation, "  size of reduced array img and state ", len(reduced_image), len(reduced_state))
     selected_images = reduced_image[:70]
     selected_states = reduced_state[:70]
     # print("After slicing  ", len(selected_images))
@@ -202,7 +200,6 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
 
     # print (collision_signal)
     # print (video.shape)
-    print (state.shape)
 
     test_or_train = random.uniform(0, 1)
     if test_or_train < .45:
@@ -216,7 +213,6 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision3'
             # np.save(str_name_state, state)
             # np.save(str_name_image, video)
-        print(str_name_image, str_name_state)
     elif test_or_train < .9:
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision3'
@@ -228,7 +224,6 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision3'
             # np.save(str_name_state, state)
             # np.save(str_name_image, video)
-        print(str_name_image, str_name_state)
     else:
         if collision_signal:
             str_name_image = base_dir + '/data_generated/aligned_version/hit_image/' + str(n_iter) + 'collision3'
@@ -240,8 +235,6 @@ def writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)
             str_name_state = base_dir + '/data_generated/aligned_version/miss_state/' + str(n_iter) + 'collision3'
             # np.save(str_name_state, state)
             # np.save(str_name_image, video)
-        print(str_name_image, str_name_state)
-        print(state.shape)
     return state
 
 
@@ -299,10 +292,7 @@ def single_simulation(n_iter, txt_file_counter):
     image_array, state_array = collectImageData(clientID) #store these images
     collision_signal = detectCollisionSignal(clientID) #This records whether hit or miss
     end_error = end(clientID)
-    if collision_signal:
-        print("HIT")
-    else:
-        print("MISS")
+
     #need to append hit or miss pos and velo and need to rewrite over last 3 position values make sure I write this info to the file
     write_to_hit_miss_txt(n_iter, collision_signal, txt_file_counter)
     data = writeImagesStatesToFiles(image_array, state_array, n_iter, collision_signal)

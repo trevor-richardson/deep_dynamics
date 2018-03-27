@@ -8,6 +8,8 @@ import os
 from os.path import isfile, join
 from os import listdir
 
+import scipy as sp
+import scipy.stats
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -24,7 +26,7 @@ config.read('../config.ini')
 base_dir = config['DEFAULT']['BASE_DIR']
 load_data_bool = False
 train_bool = True
-model_to_load = '0.158387924063.pth'
+model_to_load = '0.11827140841.pth'
 sys.path.append(base_dir + '/vrep_scripts/')
 from run_vrep_simulation import execute_exp
 
@@ -79,7 +81,6 @@ def calc_statistics(lst, recorded_state):
     pdf = stats.multivariate_normal.pdf(recorded_state, mean=mean, cov=covar)
     return pdf
 
-
 def calc_indra_1(lst, recorded_state, mean):
     delta = mean - recorded_state
     return delta, np.linalg.norm(delta)
@@ -93,7 +94,14 @@ def calc_indra_2(lst, recorded_state):
     return norm_delta, np.linalg.norm(delta_2)
 
 
-''' Main function which calls run_vrep_simulation '''
+def calc_confidence_interval(data, confidence=0.90):
+    n = len(data)
+    m, se = np.mean(data), scipy.stats.sem(data)
+
+    h = se * sp.stats.t._ppf((1+confidence)/2., n-1)
+    return m-h, m+h
+
+''' Main function which calls run_vrep_simulation in vrep_scripts'''
 
 def main():
     stochastic_forward_passes = 32
@@ -101,12 +109,20 @@ def main():
         data = execute_exp()
 
         rewards, rew = evaluate_model(stochastic_forward_passes, data)
-        # print(rew)
+        low, high = calc_confidence_interval(rew)
+        minimum = min(rew)
+        for i in range(len(rew)):
+            if rew[i] < high:
+                rew[i] = 0
+            else:
+                rew[i] += -minimum
+        print("\n")
         print(max(rew))
         print(min(rew))
-
+        print("\n\n\n")
+        print(np.round(rew, 0))
+        print("\n\n\n")
         # time.sleep(10)
-
 
 if __name__ == '__main__':
     main()
