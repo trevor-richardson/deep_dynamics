@@ -27,9 +27,10 @@ train_bool = True
 model_to_load = '0.111379066878.pth'
 
 '''
-This supervised learning model learns to predict the future state of the robot given only information retrievable to
-A robot in the field such as its internal state. Given the robot state and action predict the next state.
-In theory this is a labeling device for an unsupervised scenario which is -- did some external pertubation occur
+This supervised learning model learns to predict the future state of the robot given only information
+retrievable to a robot in the field such as its internal state. Given the robot state and action predict
+the next state. In theory this is a labeling device for an unsupervised scenario which is -- did
+some external pertubation occur
 '''
 
 ''' Load Data -- View Statistics -- Preprocess Data '''
@@ -49,13 +50,12 @@ if load_data_bool:
     for indx, element in enumerate(miss):
         miss[indx] = miss_dir + element
 
-    #here is where the split needs to occur
     hit_with_label = []
     for element in hit:
         arr = np.load(element)
         adder = []
         for index in range(arr.shape[0] - 1):
-            x = np.concatenate((arr[index], arr[index+1, :6]))
+            x = np.concatenate((arr[index], arr[index+1, :9]))
             adder.append(x)
         hit_with_label.append(np.asarray(adder))
 
@@ -64,7 +64,7 @@ if load_data_bool:
         arr = np.load(element)
         adder = []
         for index in range(arr.shape[0] - 1):
-            x = np.concatenate((arr[index], arr[index+1, :6]))
+            x = np.concatenate((arr[index], arr[index+1, :9]))
             adder.append(x)
         miss_with_label.append(np.asarray(adder))
 
@@ -186,16 +186,14 @@ def validate_model(epoch, batch_size):
         test_loss+=loss.data
         step_counter +=1
 
-    print('Test Epoch: {}\tLoss: {:.6f}'.format(
+    print('Val Epoch: {}\tLoss: {:.6f}'.format(
         epoch, test_loss.cpu().numpy()[0]/step_counter))
 
     return test_loss.cpu().numpy()[0]/step_counter
 
-
 ''' Helper functions '''
 def save_model(model, loss):
     torch.save(model.state_dict(), base_dir + '/machine_learning/saved_models/' + str(loss) + '.pth')
-
 
 def load_model(path):
     global model
@@ -215,13 +213,13 @@ def evaluate_model(num_forward_passes, single_hit, single_miss):
 
     for index in range(int(single_hit.shape[0])):
         lst = []
-        input_to_model = torch.from_numpy(single_hit[index, :7])
+        input_to_model = torch.from_numpy(single_hit[index, :10])
         if torch.cuda.is_available():
             input_to_model = input_to_model.cuda()
         input_to_model = Variable(input_to_model.float(), volatile=True)
         for inner_index in range(num_forward_passes):
             lst.append((model(input_to_model).cpu().data.numpy()))
-        small = calc_statistics(np.asarray(lst), single_hit[index, 7:])
+        small = calc_statistics(np.asarray(lst), single_hit[index, 10:])
         if smallest > small:
             smallest = small
         del(lst[:])
@@ -230,13 +228,13 @@ def evaluate_model(num_forward_passes, single_hit, single_miss):
     smallest = 9999
     for index in range(int(single_miss.shape[0])):
         lst = []
-        input_to_model = torch.from_numpy(single_miss[index, :7])
+        input_to_model = torch.from_numpy(single_miss[index, :10])
         if torch.cuda.is_available():
             input_to_model = input_to_model.cuda()
         input_to_model = Variable(input_to_model.float(), volatile=True)
         for inner_index in range(num_forward_passes):
             lst.append((model(input_to_model).cpu().data.numpy()))
-        small = calc_statistics(np.asarray(lst), single_miss[index, 7:])
+        small = calc_statistics(np.asarray(lst), single_miss[index, 10:])
         if smallest > small:
             smallest = small
         del(lst[:])
@@ -267,7 +265,7 @@ def main():
         for epoch in range(epochs):
             train_model(epoch, batch_size)
             loss = validate_model(epoch, batch_size)
-            if loss < .2:
+            if loss < .3:
                 save_model(model, loss)
                 smallest_loss = loss
             print("\n*****************************\n")

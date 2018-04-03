@@ -48,35 +48,34 @@ def get_motor_babbl_data(num_iterations):
     val = []
     test = []
 
+
     clientID, start_error = start()
     ret_code, left_handle = vrep.simxGetObjectHandle(clientID,'DynamicLeftJoint', vrep.simx_opmode_oneshot_wait)
     ret_code, right_handle = vrep.simxGetObjectHandle(clientID,'DynamicRightJoint', vrep.simx_opmode_oneshot_wait)
     ret_code, base_handle = vrep.simxGetObjectHandle(clientID, 'LineTracerBase', vrep.simx_opmode_oneshot_wait)
+    ret_code, euler_angles = vrep.simxGetObjectOrientation(clientID, base_handle, -1, vrep.simx_opmode_streaming)
     rand = np.random.randint(8)
     act = np.random.randint(5)
     action = (act -2)  * 15
     for iterator in range(num_iterations):
-        ret_code, pos = vrep.simxGetObjectPosition(clientID, base_handle, -1, vrep.simx_opmode_oneshot_wait)
-        ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot_wait)
-        ret_code, euler_angles = vrep.simxGetObjectOrientation(clientID, base_handle, -1, vrep.simx_opmode_oneshot_wait)
-
+        ret_code, pos = vrep.simxGetObjectPosition(clientID, base_handle, -1, vrep.simx_opmode_oneshot)
+        ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot)
+        ret_code, euler_angles = vrep.simxGetObjectOrientation(clientID, base_handle, -1, vrep.simx_opmode_buffer)
         if rand == 0:
-            rand = np.random.randint(8) + 1
+            rand = np.random.randint(135) + 1
             act = np.random.randint(5)
             action = (act -2)  * 15
+            return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
+            return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
 
-        if iterator % 100 == 0:
-            print(iterator)
-
-        collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], euler_angles[0], euler_angles[1],
-            euler_angles[2], action])
-        return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
-        return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
+        collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], angle_velo[0], angle_velo[1],
+            angle_velo[2], euler_angles[0], euler_angles[1], euler_angles[2], action])
+        time.sleep(.005)
         rand += -1
+
     end(clientID)
     counter = 0
     for element in collector:
-
         if counter < .15 * int(len(collector)):
             val.append(element)
         elif counter < .3 * int(len(collector)):
@@ -85,9 +84,11 @@ def get_motor_babbl_data(num_iterations):
             train.append(element)
         counter +=1
 
+
     print("train ", len(train))
     print("val ", len(val))
     print("test ", len(test))
+
 
     train_array, train_label, val_array, val_label, test_array, test_label = make_final_format(train, val, test)
     return train_array, train_label, val_array, val_label, test_array, test_label
@@ -121,7 +122,6 @@ def make_final_format(train, val, test):
     test_label = np.asarray(test_label)
     return train_array, train_label, val_array, val_label, test_array, test_label
 
-
 '''
 
 prevsim represents the number of times I've ran this to make more data
@@ -129,11 +129,10 @@ iter_start and end are what decides how many data points I will create this iter
 
 '''
 
-
 def main(prevsim):
-    num_iterations = 500
+    num_iterations = 5000
     #increment this every time so you do not overwrite the data
-    for x in range(100,400):
+    for x in range(0,400):
         train_array, train_label, val_array, val_label, test_array, test_label = get_motor_babbl_data(num_iterations)
         np.save(base_dir + '/data_generated/motor_babble/train/feature/train' + str(x), train_array)
         np.save(base_dir + '/data_generated/motor_babble/train/label/train' + str(x), train_label)

@@ -93,7 +93,6 @@ def calc_indra_2(lst, recorded_state):
     delta_2 = np.exp(delta - 2*covar)
     return norm_delta, np.linalg.norm(delta_2)
 
-
 def calc_confidence_interval(data, confidence=0.90):
     n = len(data)
     m, se = np.mean(data), scipy.stats.sem(data)
@@ -101,7 +100,7 @@ def calc_confidence_interval(data, confidence=0.90):
     h = se * sp.stats.t._ppf((1+confidence)/2., n-1)
     return m-h, m+h
 
-''' Main function which calls run_vrep_simulation in vrep_scripts'''
+''' Main function which calls run_vrep_simulation in vrep_scripts '''
 
 def main():
     stochastic_forward_passes = 32
