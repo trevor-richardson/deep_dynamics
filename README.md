@@ -6,9 +6,9 @@ Train a neural network to regress future states given the current state and acti
 
 ## Demo
 
-<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim1logo-_1_.gif" width="750">
-<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim2logo-_1_.gif" width="750">
-<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim3logo-_1_.gif" width="750">
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim1logo-_1_.gif" width="950">
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim2logo-_1_.gif" width="950">
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim3logo-_1_.gif" width="950">
 
 ---
 
