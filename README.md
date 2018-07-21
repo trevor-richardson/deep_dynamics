@@ -3,9 +3,9 @@ Robotics Deep Neural Network -- Given (S_t, a_t) -> predict S_(t+1) where S - re
 Describe the entire repository
 
 ## Demo
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim1logo-_1_.gif" width="500">
 <img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim2logo-_1_.gif" width="500">
-<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim2logo-_2_.gif" width="500">
-<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim2logo-_3_.gif" width="500">
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim3logo-_1_.gif" width="500">
 
 ---
 
