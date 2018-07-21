@@ -99,10 +99,11 @@ def collectImageData(clientID):
         collision_bool = False
         count = 0
         updated_counter = 0
+
         while (vrep.simxGetConnectionId(clientID)!=-1 and time.time() < t_end):
             res,resolution,image=vrep.simxGetVisionSensorImage(clientID,v0,0,vrep.simx_opmode_buffer)
 
-            if count % 75 == 0:
+            if count % 25 == 0:
                 act = np.random.randint(5)
                 action = (act -2)  * 15
                 updated_counter+=1
@@ -115,7 +116,8 @@ def collectImageData(clientID):
                 ret_code, velo, angle_velo = vrep.simxGetObjectVelocity(clientID, base_handle, vrep.simx_opmode_oneshot)
                 ret_code, euler_angles = vrep.simxGetObjectOrientation(clientID, base_handle, -1, vrep.simx_opmode_buffer)
 
-                collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], euler_angles[0], euler_angles[1], euler_angles[2], action])
+                collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2],
+                    euler_angles[0], euler_angles[1], euler_angles[2], action])
 
                 img = np.array(image,dtype=np.uint8)
                 img.resize([resolution[1],resolution[0],3])

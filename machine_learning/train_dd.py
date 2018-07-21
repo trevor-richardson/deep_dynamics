@@ -24,7 +24,9 @@ config.read('../config.ini')
 base_dir = config['DEFAULT']['BASE_DIR']
 load_data_bool = False
 train_bool = True
-model_to_load = '0.111379066878.pth'
+model_to_load = '0.0867512805769.pth'
+
+num_files = 260
 
 '''
 This supervised learning model learns to predict the future state of the robot given only information
@@ -55,7 +57,7 @@ if load_data_bool:
         arr = np.load(element)
         adder = []
         for index in range(arr.shape[0] - 1):
-            x = np.concatenate((arr[index], arr[index+1, :9]))
+            x = np.concatenate((arr[index], arr[index+1, :6]))
             adder.append(x)
         hit_with_label.append(np.asarray(adder))
 
@@ -64,7 +66,7 @@ if load_data_bool:
         arr = np.load(element)
         adder = []
         for index in range(arr.shape[0] - 1):
-            x = np.concatenate((arr[index], arr[index+1, :9]))
+            x = np.concatenate((arr[index], arr[index+1, :6]))
             adder.append(x)
         miss_with_label.append(np.asarray(adder))
 
@@ -102,7 +104,7 @@ else:
     test_data = np.load(base_dir + '/data_generated/motor_babble/test/feature/test0.npy')
     test_label = np.load(base_dir + '/data_generated/motor_babble/test/label/test0.npy')
 
-    for i in range(100):
+    for i in range(num_files):
         data2 = np.load(base_dir + '/data_generated/motor_babble/train/feature/train' + str(i) + '.npy')
         label2 = np.load(base_dir + '/data_generated/motor_babble/train/label/train' + str(i) + '.npy')
         val_data2 = np.load(base_dir + '/data_generated/motor_babble/val/feature/val' + str(i) + '.npy')
@@ -203,7 +205,6 @@ def load_model(path):
         print("Not a valid model to load")
         sys.exit()
 
-#load 70% of the data for training save best validation error
 '''Test what strategy allows me to classify hits vs misses'''
 def evaluate_model(num_forward_passes, single_hit, single_miss):
     print("evaluating strategy")
@@ -213,13 +214,13 @@ def evaluate_model(num_forward_passes, single_hit, single_miss):
 
     for index in range(int(single_hit.shape[0])):
         lst = []
-        input_to_model = torch.from_numpy(single_hit[index, :10])
+        input_to_model = torch.from_numpy(single_hit[index, :7])
         if torch.cuda.is_available():
             input_to_model = input_to_model.cuda()
         input_to_model = Variable(input_to_model.float(), volatile=True)
         for inner_index in range(num_forward_passes):
             lst.append((model(input_to_model).cpu().data.numpy()))
-        small = calc_statistics(np.asarray(lst), single_hit[index, 10:])
+        small = calc_statistics(np.asarray(lst), single_hit[index, 7:])
         if smallest > small:
             smallest = small
         del(lst[:])
@@ -228,18 +229,17 @@ def evaluate_model(num_forward_passes, single_hit, single_miss):
     smallest = 9999
     for index in range(int(single_miss.shape[0])):
         lst = []
-        input_to_model = torch.from_numpy(single_miss[index, :10])
+        input_to_model = torch.from_numpy(single_miss[index, :7])
         if torch.cuda.is_available():
             input_to_model = input_to_model.cuda()
         input_to_model = Variable(input_to_model.float(), volatile=True)
         for inner_index in range(num_forward_passes):
             lst.append((model(input_to_model).cpu().data.numpy()))
-        small = calc_statistics(np.asarray(lst), single_miss[index, 10:])
+        small = calc_statistics(np.asarray(lst), single_miss[index, 7:])
         if smallest > small:
             smallest = small
         del(lst[:])
     print(smallest, "miss")
-
 
 '''Calculate "probability kinda" of hit'''
 def calc_statistics(lst, recorded_state):
@@ -248,7 +248,6 @@ def calc_statistics(lst, recorded_state):
     var = np.var(lst)
     f = stats.multivariate_normal.pdf(recorded_state, mean=mean, cov=var)
     return np.min(f)
-
 
 def main():
     global model
@@ -265,7 +264,7 @@ def main():
         for epoch in range(epochs):
             train_model(epoch, batch_size)
             loss = validate_model(epoch, batch_size)
-            if loss < .3:
+            if loss < .2:
                 save_model(model, loss)
                 smallest_loss = loss
             print("\n*****************************\n")

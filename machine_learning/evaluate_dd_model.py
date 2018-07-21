@@ -26,7 +26,7 @@ config.read('../config.ini')
 base_dir = config['DEFAULT']['BASE_DIR']
 load_data_bool = False
 train_bool = True
-model_to_load = '0.11827140841.pth'
+model_to_load = '0.0910420495853.pth'
 sys.path.append(base_dir + '/vrep_scripts/')
 from run_vrep_simulation import execute_exp
 
@@ -121,7 +121,6 @@ def main():
         print("\n\n\n")
         print(np.round(rew, 0))
         print("\n\n\n")
-        # time.sleep(10)
 
 if __name__ == '__main__':
     main()

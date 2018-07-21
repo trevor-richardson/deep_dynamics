@@ -7,7 +7,6 @@ import random
 import scipy.io as sio
 import scipy
 from scipy import ndimage
-import cv2
 from time import sleep
 import configparser
 
@@ -30,7 +29,6 @@ Have a global variable I iterate each time to represent the current iteration of
 def start():
     vrep.simxFinish(-1) # just in case, close all opened connections
     clientID=vrep.simxStart('127.0.0.1',19997,True,True,5000,5) #start my Connection
-    #x =vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot)
     error_code =vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot_wait)
     return clientID, error_code
 
@@ -47,7 +45,6 @@ def get_motor_babbl_data(num_iterations):
     train = []
     val = []
     test = []
-
 
     clientID, start_error = start()
     ret_code, left_handle = vrep.simxGetObjectHandle(clientID,'DynamicLeftJoint', vrep.simx_opmode_oneshot_wait)
@@ -68,8 +65,8 @@ def get_motor_babbl_data(num_iterations):
             return_val = vrep.simxSetJointTargetVelocity(clientID, left_handle, action, vrep.simx_opmode_oneshot)
             return_val2 = vrep.simxSetJointTargetVelocity(clientID, right_handle, action, vrep.simx_opmode_oneshot_wait)
 
-        collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], angle_velo[0], angle_velo[1],
-            angle_velo[2], euler_angles[0], euler_angles[1], euler_angles[2], action])
+        collector.append([pos[0], pos[1], pos[2], velo[0], velo[1], velo[2], euler_angles[0],
+            euler_angles[1], euler_angles[2], action])
         time.sleep(.005)
         rand += -1
 
@@ -84,11 +81,9 @@ def get_motor_babbl_data(num_iterations):
             train.append(element)
         counter +=1
 
-
     print("train ", len(train))
     print("val ", len(val))
     print("test ", len(test))
-
 
     train_array, train_label, val_array, val_label, test_array, test_label = make_final_format(train, val, test)
     return train_array, train_label, val_array, val_label, test_array, test_label
@@ -122,17 +117,12 @@ def make_final_format(train, val, test):
     test_label = np.asarray(test_label)
     return train_array, train_label, val_array, val_label, test_array, test_label
 
-'''
 
-prevsim represents the number of times I've ran this to make more data
-iter_start and end are what decides how many data points I will create this iteration
 
-'''
-
-def main(prevsim):
+def main():
     num_iterations = 5000
-    #increment this every time so you do not overwrite the data
-    for x in range(0,400):
+
+    for x in range(260,1000):
         train_array, train_label, val_array, val_label, test_array, test_label = get_motor_babbl_data(num_iterations)
         np.save(base_dir + '/data_generated/motor_babble/train/feature/train' + str(x), train_array)
         np.save(base_dir + '/data_generated/motor_babble/train/label/train' + str(x), train_label)
@@ -145,5 +135,4 @@ def main(prevsim):
 
 
 if __name__ == '__main__':
-    prevsim = 0
-    main(prevsim)
+    main()
