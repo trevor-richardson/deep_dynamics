@@ -3,7 +3,7 @@ General data-driven framework for robotic collision detection. <br/>
 <br/>
 Train a neural network to regress future states given the current state and action. Stochatsic forward passes are used at inference time in order to produce a belief distribution over the future next state of the robot. An exponentially smoothed norm is used between the set of regressed future states and the ground truth collected in the next time-step. <br/> <br/>
 
-<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/deepdynamics.png" width="650"> <br/>
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/deepdynamics.png" width="800"> <br/>
 
 ## Demo
 
