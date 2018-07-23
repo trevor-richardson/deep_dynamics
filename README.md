@@ -1,14 +1,15 @@
 # deep_dynamics
-General data-driven framework for robotic collision detection. \
-\
-Train a neural network to regress future states given the current state and action. Stochatsic forward passes are used at inference time in order to produce a belief distribution over the future next state of the robot. An exponentially smoothed norm is used between the set of regressed future states and the ground truth collected in the next time-step.
+General data-driven framework for robotic collision detection. <br/>
+<br/>
+Train a neural network to regress future states given the current state and action. Stochatsic forward passes are used at inference time in order to produce a belief distribution over the future next state of the robot. An exponentially smoothed norm is used between the set of regressed future states and the ground truth collected in the next time-step. <br/> <br/>
 
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/dd_model.png" width="950"> <br/>
 
 ## Demo
 
 <img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim1logo-_1_.gif" width="950">
 <img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim2logo-_1_.gif" width="950">
-<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim3logo-_1_.gif" width="1000">
+<img src="https://github.com/trevor-richardson/deep_dynamics/blob/master/visualizations/sim3logo-_1_.gif" width="950">
 
 ---
 
